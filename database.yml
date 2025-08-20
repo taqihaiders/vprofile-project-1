@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+  labels:
+    app: mysql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec: # Optional, can keep if needed
+      containers:
+        - name: mysql
+          image: 650576187890.dkr.ecr.us-east-1.amazonaws.com/vpro-db:latest # Replace with your MySQL image
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql
+  labels:
+    app: mysql
+spec:
+  selector:
+    app: mysql  # Matches the labels of the MySQL pods
+  ports:
+    - protocol: TCP
+      port: 3306        # The port on which MySQL is running
+      targetPort: 3306   # The port on the MySQL container
+  clusterIP: None        # Use None for headless service (optional, depends on your use case)
