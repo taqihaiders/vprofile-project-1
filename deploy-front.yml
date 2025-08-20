@@ -1,0 +1,93 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-deployment  # Make sure the name matches your backend app
+  labels:
+    app: backend
+spec:
+  replicas: 1  # Number of pods you want to run
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+        - name: backend
+          image: 650576187890.dkr.ecr.us-east-1.amazonaws.com/vpro-fe:latest  # Replace with your backend Docker image
+          ports:
+            - containerPort: 8080
+          env:
+            # Database Configuration
+            - name: DB_HOST
+              value: "mysql"  # Ensure it's quoted as a string
+            - name: DB_PORT
+              value: "3306"  # Ensure it's quoted as a string
+            - name: DB_NAME
+              value: "accounts"  # Ensure it's quoted as a string
+            - name: DB_USERNAME
+              value: "root"  # Ensure it's quoted as a string
+            - name: DB_PASSWORD
+              value: "vprodbpass"  # Ensure it's quoted as a string
+
+            # Memcached Configuration
+            - name: MEMCACHED_ACTIVE_HOST
+              value: "vprocache01"  # Ensure it's quoted as a string
+            - name: MEMCACHED_ACTIVE_PORT
+              value: "11211"  # Ensure it's quoted as a string
+            - name: MEMCACHED_STANDBY_HOST
+              value: "127.0.0.2"  # Ensure it's quoted as a string
+            - name: MEMCACHED_STANDBY_PORT
+              value: "11211"  # Ensure it's quoted as a string
+
+            # RabbitMQ Configuration
+            - name: RABBITMQ_HOST
+              value: "vpromq01"  # Ensure it's quoted as a string
+            - name: RABBITMQ_PORT
+              value: "5672"  # Ensure it's quoted as a string
+            - name: RABBITMQ_USERNAME
+              value: "guest"  # Ensure it's quoted as a string
+            - name: RABBITMQ_PASSWORD
+              value: "guest"  # Ensure it's quoted as a string
+
+            # Elasticsearch Configuration
+            - name: ELASTICSEARCH_HOST
+              value: "localhost"  # Ensure it's quoted as a string
+            - name: ELASTICSEARCH_PORT
+              value: "9300"  # Ensure it's quoted as a string
+            - name: ELASTICSEARCH_CLUSTER
+              value: "vprofile"  # Ensure it's quoted as a string
+            - name: ELASTICSEARCH_NODE
+              value: "vprofilenode"  # Ensure it's quoted as a string
+
+            # Application Configuration
+            - name: SPRING_SECURITY_USER_NAME
+              value: "admin_vp"  # Ensure it's quoted as a string
+            - name: SPRING_SECURITY_USER_PASSWORD
+              value: "admin_vp"  # Ensure it's quoted as a string
+            - name: SPRING_SECURITY_USER_ROLES
+              value: "ADMIN"  # Ensure it's quoted as a string
+
+            # File Upload Configuration
+            - name: MAX_FILE_SIZE
+              value: "128KB"  # Ensure it's quoted as a string
+            - name: MAX_REQUEST_SIZE
+              value: "128KB"  # Ensure it's quoted as a string
+
+            # Logging Configuration
+            - name: LOGGING_LEVEL_ROOT
+              value: "INFO"  # Ensure it's quoted as a string
+            - name: LOGGING_LEVEL_SECURITY
+              value: "DEBUG"  # Ensure it's quoted as a string
+            - name: LOGGING_LEVEL_HIBERNATE
+              value: "OFF"  # Ensure it's quoted as a string
+
+          resources:
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
