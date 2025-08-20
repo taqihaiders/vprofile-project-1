@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-service  # Name of the service
+  labels:
+    app: backend
+spec:
+  selector:
+    app: backend  # Matches the labels of the backend pod
+  ports:
+    - protocol: TCP
+      port: 8080      # Exposing port 8080 (from the backend container)
+      targetPort: 8080 # The container port to forward traffic to
+  type: NodePort     # Default, for internal cluster access
