@@ -1,9 +1,7 @@
 name: Docker Build and Push to ECR
 
 on:
-  push:
-    branches:
-      - docker  # Trigger the pipeline on pushing to the main branch (or use any other branch)
+  workflow_dispatch:  # Trigger the pipeline on pushing to the main branch (or use any other branch)
 
 jobs:
   # Job 1: Build and Push Backend (Frontend) Docker Image
