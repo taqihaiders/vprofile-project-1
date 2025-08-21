@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-deployment  # Make sure the name matches your backend app
+  labels:
+    app: backend
+spec:
+  replicas: 1  # Number of pods you want to run
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      serviceAccountName: app-service-account
+      containers:
+        - name: backend
+          image: 650576187890.dkr.ecr.us-east-1.amazonaws.com/vpro-fe:latest  # Replace with your backend Docker image
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - name: secrets-store
+              mountPath: "/mnt/secrets"
+              readOnly: true
+          resources:
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+      volumes:
+        - name: secrets-store
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: external-secrets
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-service  # Name of the service
+  labels:
+    app: backend
+spec:
+  selector:
+    app: backend  # Matches the labels of the backend pod
+  ports:
+    - protocol: TCP
+      port: 8080      # Exposing port 8080 (from the backend container)
+      targetPort: 8080 # The container port to forward traffic to
+  type: NodePort     # Default, for internal cluster access
+
+
+
+
