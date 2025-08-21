@@ -23,18 +23,16 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      # Step 3: Log in to Amazon ECR
-      # Step 3: Log in to Amazon ECR
-      - name: Log in to Amazon ECR
-        run: |
-          aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin 650576187890.dkr.ecr.us-east-1.amazonaws.com
-
+      # Step 3: Log in to Amazon ECR using the recommended method
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
 
       # Step 4: Set image name and repository for frontend (app)
       - name: Set image name for frontend (app)
         run: |
           FRONTEND_REPO=vpro-fe  # Frontend ECR repository
-          FRONTEND_IMAGE_NAME=650576187890.dkr.ecr.us-east-1.amazonaws.com/$FRONTEND_REPO:latest
+          FRONTEND_IMAGE_NAME=${{ steps.login-ecr.outputs.registry }}/$FRONTEND_REPO:latest
           echo "FRONTEND_IMAGE_NAME=${FRONTEND_IMAGE_NAME}" >> $GITHUB_ENV
 
       # Step 5: Build the frontend Docker image
@@ -64,16 +62,16 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      # Step 3: Log in to Amazon ECR
-      - name: Log in to Amazon ECR
-        run: |
-          aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin 650576187890.dkr.ecr.us-east-1.amazonaws.com
+      # Step 3: Log in to Amazon ECR using the recommended method
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
 
       # Step 4: Set image name and repository for database (db)
       - name: Set image name for database (db)
         run: |
           DB_REPO=vpro-db  # Database ECR repository
-          DB_IMAGE_NAME=650576187890.dkr.ecr.us-east-1.amazonaws.com/$DB_REPO:latest
+          DB_IMAGE_NAME=${{ steps.login-ecr.outputs.registry }}/$DB_REPO:latest
           echo "DB_IMAGE_NAME=${DB_IMAGE_NAME}" >> $GITHUB_ENV
 
       # Step 5: Build the database Docker image
