@@ -38,7 +38,7 @@ jobs:
       # Step 5: Build the frontend Docker image
       - name: Build frontend Docker image
         run: |
-          docker build -f Docker-files/app -t $FRONTEND_IMAGE_NAME .
+          docker build -f Docker-files/app/Dockerfile -t $FRONTEND_IMAGE_NAME .
 
       # Step 6: Push the frontend image to Amazon ECR
       - name: Push frontend Docker image to ECR
@@ -77,7 +77,7 @@ jobs:
       # Step 5: Build the database Docker image
       - name: Build database Docker image
         run: |
-          docker build -f Docker-files/db -t $DB_IMAGE_NAME .
+          docker build -f Docker-files/db/Dockerfile -t $DB_IMAGE_NAME .
 
       # Step 6: Push the database image to Amazon ECR
       - name: Push database Docker image to ECR
