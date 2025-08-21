@@ -1,0 +1,67 @@
+# Multi-stage Dockerfile that builds the application without requiring local Maven
+FROM maven:latest AS builder
+
+LABEL "Project"="Vprofile"
+LABEL "Author"="Imran"
+LABEL "Description"="VProfile Java Web Application Builder"
+
+# Set working directory
+WORKDIR /app
+
+# Copy pom.xml first for better Docker layer caching
+COPY pom.xml .
+
+# Download dependencies (this layer will be cached if pom.xml doesn't change)
+RUN mvn dependency:go-offline -B
+
+# Copy source code
+COPY src ./src
+
+# Build the application
+RUN mvn clean package -DskipTests -B
+
+# Production stage
+FROM tomcat:10-jdk21
+
+LABEL "Project"="Vprofile"
+LABEL "Author"="Imran"
+LABEL "Description"="VProfile Java Web Application"
+
+# Install additional tools for debugging and health checks
+RUN apt-get update && apt-get install -y \
+    curl \
+    telnet \
+    netcat-traditional \
+    && rm -rf /var/lib/apt/lists/*
+
+# Remove default webapps
+RUN rm -rf /usr/local/tomcat/webapps/*
+
+# Create necessary directories
+RUN mkdir -p /usr/local/tomcat/logs \
+    && mkdir -p /usr/local/tomcat/conf/Catalina/localhost
+
+# Copy the WAR file from builder stage
+COPY --from=builder /app/target/*.war /usr/local/tomcat/webapps/ROOT.war
+
+# Set environment variables for JVM tuning
+ENV JAVA_OPTS="-Djava.security.egd=file:/dev/./urandom -Xmx512m -Xms256m"
+ENV CATALINA_OPTS="-Dspring.profiles.active=docker"
+
+# Create a non-root user for security
+RUN groupadd -r tomcat && useradd -r -g tomcat tomcat
+RUN chown -R tomcat:tomcat /usr/local/tomcat
+USER tomcat
+
+# Expose port
+EXPOSE 8080
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+  CMD curl -f http://localhost:8080/ || exit 1
+
+# Set working directory
+WORKDIR /usr/local/tomcat
+
+# Start Tomcat
+CMD ["catalina.sh", "run"]
