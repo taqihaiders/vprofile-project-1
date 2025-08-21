@@ -10,7 +10,7 @@ ENV MYSQL_USER=${DB_USERNAME:-vprouser}
 ENV MYSQL_PASSWORD=${DB_PASSWORD:-vprodbpass}
 
 # Copy database initialization script
-COPY . /docker-entrypoint-initdb.d/01-init.sql
+COPY db_backup.sql /docker-entrypoint-initdb.d/01-init.sql
 
 # Copy custom MySQL configuration if needed
 # COPY my.cnf /etc/mysql/conf.d/
