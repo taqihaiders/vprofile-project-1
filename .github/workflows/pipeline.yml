@@ -24,9 +24,11 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }}
 
       # Step 3: Log in to Amazon ECR
+      # Step 3: Log in to Amazon ECR
       - name: Log in to Amazon ECR
         run: |
           aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin 650576187890.dkr.ecr.us-east-1.amazonaws.com
+
 
       # Step 4: Set image name and repository for frontend (app)
       - name: Set image name for frontend (app)
