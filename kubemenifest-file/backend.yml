@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: backend-deployment  # Make sure the name matches your backend app
+  namespace: default
   labels:
     app: backend
 spec:
@@ -43,6 +44,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: backend-service  # Name of the service
+  namespace: default
   labels:
     app: backend
 spec:
